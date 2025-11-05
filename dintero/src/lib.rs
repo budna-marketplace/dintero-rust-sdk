@@ -15,6 +15,11 @@ pub mod orders {
     pub use dintero_orders::*;
 }
 
+#[cfg(feature = "payments")]
+pub mod payments {
+    pub use dintero_payments::*;
+}
+
 pub use client::HttpClient;
 pub use config::{AuthConfig, Config, ConfigBuilder, Environment, RetryConfig};
 pub use error::{Error, Result};
@@ -73,6 +78,12 @@ impl DinteroClient {
     pub fn orders(&self) -> orders::OrdersClient<HttpClient> {
         let account_id = self.http.account_id().to_string();
         orders::OrdersClient::new((*self.http).clone(), account_id)
+    }
+
+    #[cfg(feature = "payments")]
+    pub fn payments(&self) -> payments::PaymentsClient<HttpClient> {
+        let account_id = self.http.account_id().to_string();
+        payments::PaymentsClient::new((*self.http).clone(), account_id)
     }
 }
 

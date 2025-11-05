@@ -1,3 +1,5 @@
+use crate::payouts::*;
+use crate::settlements::*;
 use crate::transactions::*;
 use async_trait::async_trait;
 
@@ -51,6 +53,36 @@ pub trait PaymentsOperations: Send + Sync {
         transaction_id: &str,
         request: ExtendAuthorizationRequest,
     ) -> Result<Transaction>;
+
+    async fn list_settlements(&self) -> Result<SettlementListResponse>;
+    async fn get_settlement_report_config(&self, config_id: &str)
+        -> Result<SettlementReportConfig>;
+    async fn list_settlement_report_configs(&self) -> Result<Vec<SettlementReportConfig>>;
+    async fn create_settlement_report_config(
+        &self,
+        request: CreateSettlementReportConfigRequest,
+    ) -> Result<SettlementReportConfig>;
+    async fn update_settlement_report_config(
+        &self,
+        config_id: &str,
+        request: UpdateSettlementReportConfigRequest,
+    ) -> Result<SettlementReportConfig>;
+    async fn delete_settlement_report_config(&self, config_id: &str) -> Result<()>;
+
+    async fn list_payout_destinations(&self) -> Result<PayoutDestinationListResponse>;
+    async fn create_payout_destination(
+        &self,
+        request: CreatePayoutDestinationRequest,
+    ) -> Result<PayoutDestination>;
+    async fn get_payout_balance(&self, destination_id: &str) -> Result<PayoutBalance>;
+    async fn list_payout_transfers(
+        &self,
+        destination_id: &str,
+    ) -> Result<PayoutTransferListResponse>;
+    async fn create_payout_transfer(
+        &self,
+        request: CreatePayoutTransferRequest,
+    ) -> Result<PayoutTransfer>;
 }
 
 #[async_trait]
@@ -66,6 +98,7 @@ pub trait PaymentsAdapter: Send + Sync {
         path: &str,
         body: &B,
     ) -> Result<T>;
+    async fn delete(&self, path: &str) -> Result<()>;
 }
 
 pub struct PaymentsClient<A: PaymentsAdapter> {
@@ -177,6 +210,101 @@ impl<A: PaymentsAdapter> PaymentsOperations for PaymentsClient<A> {
             "accounts/{}/transactions/{}/extend_authorization",
             self.account_id, transaction_id
         );
+        self.adapter.post_json(&path, &request).await
+    }
+
+    async fn list_settlements(&self) -> Result<SettlementListResponse> {
+        let path = format!("accounts/{}/settlements", self.account_id);
+        self.adapter.get_json(&path).await
+    }
+
+    async fn get_settlement_report_config(
+        &self,
+        config_id: &str,
+    ) -> Result<SettlementReportConfig> {
+        let path = format!(
+            "accounts/{}/settlement_report_configs/{}",
+            self.account_id, config_id
+        );
+        self.adapter.get_json(&path).await
+    }
+
+    async fn list_settlement_report_configs(&self) -> Result<Vec<SettlementReportConfig>> {
+        let path = format!("accounts/{}/settlement_report_configs", self.account_id);
+        self.adapter.get_json(&path).await
+    }
+
+    async fn create_settlement_report_config(
+        &self,
+        request: CreateSettlementReportConfigRequest,
+    ) -> Result<SettlementReportConfig> {
+        let path = format!("accounts/{}/settlement_report_configs", self.account_id);
+        self.adapter.post_json(&path, &request).await
+    }
+
+    async fn update_settlement_report_config(
+        &self,
+        config_id: &str,
+        request: UpdateSettlementReportConfigRequest,
+    ) -> Result<SettlementReportConfig> {
+        let path = format!(
+            "accounts/{}/settlement_report_configs/{}",
+            self.account_id, config_id
+        );
+        self.adapter.put_json(&path, &request).await
+    }
+
+    async fn delete_settlement_report_config(&self, config_id: &str) -> Result<()> {
+        let path = format!(
+            "accounts/{}/settlement_report_configs/{}",
+            self.account_id, config_id
+        );
+        self.adapter.delete(&path).await
+    }
+
+    async fn list_payout_destinations(&self) -> Result<PayoutDestinationListResponse> {
+        let path = format!(
+            "accounts/{}/management/settings/approvals/payout_destinations",
+            self.account_id
+        );
+        self.adapter.get_json(&path).await
+    }
+
+    async fn create_payout_destination(
+        &self,
+        request: CreatePayoutDestinationRequest,
+    ) -> Result<PayoutDestination> {
+        let path = format!(
+            "accounts/{}/management/settings/approvals/payout_destinations",
+            self.account_id
+        );
+        self.adapter.post_json(&path, &request).await
+    }
+
+    async fn get_payout_balance(&self, destination_id: &str) -> Result<PayoutBalance> {
+        let path = format!(
+            "accounts/{}/payout_destinations/{}/balance",
+            self.account_id, destination_id
+        );
+        self.adapter.get_json(&path).await
+    }
+
+    async fn list_payout_transfers(
+        &self,
+        destination_id: &str,
+    ) -> Result<PayoutTransferListResponse> {
+        let path = format!(
+            "accounts/{}/payout_destinations/{}/transfers",
+            self.account_id, destination_id
+        );
+        self.adapter.get_json(&path).await
+    }
+
+    async fn create_payout_transfer(
+        &self,
+        request: CreatePayoutTransferRequest,
+    ) -> Result<PayoutTransfer> {
+        let path = format!("accounts/{}/payout/fund_transfers", self.account_id);
         self.adapter.post_json(&path, &request).await
     }
 }

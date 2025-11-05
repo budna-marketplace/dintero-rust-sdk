@@ -6,3 +6,6 @@ pub use checkout::CheckoutHttpAdapter;
 
 #[cfg(feature = "orders")]
 pub mod orders;
+
+#[cfg(feature = "payments")]
+pub mod payments;

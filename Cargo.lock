@@ -148,6 +148,7 @@ dependencies = [
  "chrono",
  "dintero-checkout",
  "dintero-orders",
+ "dintero-payments",
  "reqwest",
  "serde",
  "serde_json",
