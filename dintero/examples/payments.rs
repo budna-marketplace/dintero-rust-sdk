@@ -1,8 +1,10 @@
 use dintero::payments::*;
 use dintero::{Config, DinteroClient, Environment};
 
+type StdResult<T> = std::result::Result<T, Box<dyn std::error::Error>>;
+
 #[tokio::main]
-async fn main() -> Result<(), Box<dyn std::error::Error>> {
+async fn main() -> StdResult<()> {
     tracing_subscriber::fmt::init();
 
     let config = Config::builder("T12345678")

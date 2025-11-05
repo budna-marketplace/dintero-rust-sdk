@@ -4,6 +4,11 @@ use crate::client::HttpClient;
 use dintero_accounts::{
     Account, AccountList, AccountsClient, Profile, ProfileList, Session, UpdateAccountRequest,
     UpdateProfileRequest,
+    account::AccountDetails,
+    locations::{Location, Terminal},
+    users::User,
+    clients::OAuthClient,
+    gateways::GatewayConnection,
 };
 
 #[cfg(feature = "accounts")]
@@ -63,5 +68,37 @@ impl AccountsAdapter {
 
     pub async fn get_session(&self) -> Result<Session, dintero_accounts::AccountError> {
         self.accounts_client.get_session().await
+    }
+
+    pub async fn get_account_details(&self) -> Result<AccountDetails, dintero_accounts::AccountError> {
+        self.accounts_client.get_account_details().await
+    }
+
+    pub async fn list_locations(&self) -> Result<Vec<Location>, dintero_accounts::AccountError> {
+        self.accounts_client.list_locations().await
+    }
+
+    pub async fn get_location(&self, location_id: &str) -> Result<Location, dintero_accounts::AccountError> {
+        self.accounts_client.get_location(location_id).await
+    }
+
+    pub async fn list_terminals(&self, location_id: &str) -> Result<Vec<Terminal>, dintero_accounts::AccountError> {
+        self.accounts_client.list_terminals(location_id).await
+    }
+
+    pub async fn list_users(&self) -> Result<Vec<User>, dintero_accounts::AccountError> {
+        self.accounts_client.list_users().await
+    }
+
+    pub async fn get_user(&self, user_id: &str) -> Result<User, dintero_accounts::AccountError> {
+        self.accounts_client.get_user(user_id).await
+    }
+
+    pub async fn list_oauth_clients(&self) -> Result<Vec<OAuthClient>, dintero_accounts::AccountError> {
+        self.accounts_client.list_oauth_clients().await
+    }
+
+    pub async fn list_gateway_connections(&self) -> Result<Vec<GatewayConnection>, dintero_accounts::AccountError> {
+        self.accounts_client.list_gateway_connections().await
     }
 }

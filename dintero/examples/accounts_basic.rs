@@ -1,7 +1,7 @@
 use dintero::{Config, DinteroClient, Environment};
 
 #[cfg(feature = "accounts")]
-use dintero::accounts::{UpdateAccountRequest, UpdateProfileRequest, AccountSettings};
+use dintero::accounts::{UpdateAccountRequest, UpdateProfileRequest};
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
