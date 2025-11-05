@@ -277,10 +277,6 @@ Build documentation locally:
 cargo doc --all-features --open
 ```
 
-## Contributing
-
-Contributions are welcome! Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of conduct and the process for submitting pull requests.
-
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
@@ -295,7 +291,3 @@ Author: Marcus Cvjeticanin
 
 - [Dintero Documentation](https://docs.dintero.com)
 - [GitHub Issues](https://github.com/budna-platform/dintero-rust-sdk/issues)
-
-## Changelog
-
-See [CHANGELOG.md](CHANGELOG.md) for a detailed history of changes.
