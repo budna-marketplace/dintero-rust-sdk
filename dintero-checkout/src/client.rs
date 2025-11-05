@@ -27,6 +27,11 @@ impl From<serde_json::Error> for CheckoutError {
 pub trait CheckoutOperations: Send + Sync {
     async fn create_session(&self, request: CreateSessionRequest) -> Result<CheckoutSession>;
     async fn get_session(&self, session_id: &str) -> Result<CheckoutSession>;
+    async fn update_session(
+        &self,
+        session_id: &str,
+        request: CreateSessionRequest,
+    ) -> Result<CheckoutSession>;
     async fn list_sessions(&self, params: ListSessionsParams) -> Result<SessionListResponse>;
     async fn cancel_session(&self, session_id: &str) -> Result<CheckoutSession>;
 
@@ -38,8 +43,16 @@ pub trait CheckoutOperations: Send + Sync {
         request: CreateProfileRequest,
     ) -> Result<SessionProfile>;
     async fn delete_profile(&self, profile_id: &str) -> Result<()>;
+    async fn list_profiles(&self) -> Result<Vec<SessionProfile>>;
 
     async fn get_transaction(&self, transaction_id: &str) -> Result<Transaction>;
+    async fn list_transactions(&self) -> Result<Vec<Transaction>>;
+    async fn update_transaction(
+        &self,
+        transaction_id: &str,
+        metadata: serde_json::Value,
+    ) -> Result<Transaction>;
+    async fn extend_authorization(&self, transaction_id: &str, days: u32) -> Result<Transaction>;
     async fn capture_transaction(
         &self,
         transaction_id: &str,
@@ -57,6 +70,7 @@ pub trait CheckoutOperations: Send + Sync {
     ) -> Result<Transaction>;
 
     async fn get_card_token(&self, token_id: &str) -> Result<CardToken>;
+    async fn list_card_tokens(&self) -> Result<Vec<CardToken>>;
     async fn delete_card_token(&self, token_id: &str) -> Result<()>;
 }
 
@@ -104,6 +118,16 @@ impl<C: HttpClient> CheckoutOperations for CheckoutClient<C> {
     async fn get_session(&self, session_id: &str) -> Result<CheckoutSession> {
         let path = format!("accounts/{}/sessions/{}", self.account_id, session_id);
         self.client.get_json(&path).await
+    }
+
+    async fn update_session(
+        &self,
+        session_id: &str,
+        request: CreateSessionRequest,
+    ) -> Result<CheckoutSession> {
+        let path = format!("accounts/{}/sessions/{}", self.account_id, session_id);
+        let payload: CreateSessionRequestPayload = request.into();
+        self.client.put_json(&path, &payload).await
     }
 
     async fn list_sessions(&self, params: ListSessionsParams) -> Result<SessionListResponse> {
@@ -166,12 +190,43 @@ impl<C: HttpClient> CheckoutOperations for CheckoutClient<C> {
         self.client.delete(&path).await
     }
 
+    async fn list_profiles(&self) -> Result<Vec<SessionProfile>> {
+        let path = format!("accounts/{}/session_profile", self.account_id);
+        self.client.get_json(&path).await
+    }
+
     async fn get_transaction(&self, transaction_id: &str) -> Result<Transaction> {
         let path = format!(
             "accounts/{}/transactions/{}",
             self.account_id, transaction_id
         );
         self.client.get_json(&path).await
+    }
+
+    async fn list_transactions(&self) -> Result<Vec<Transaction>> {
+        let path = format!("accounts/{}/transactions", self.account_id);
+        self.client.get_json(&path).await
+    }
+
+    async fn update_transaction(
+        &self,
+        transaction_id: &str,
+        metadata: serde_json::Value,
+    ) -> Result<Transaction> {
+        let path = format!(
+            "accounts/{}/transactions/{}",
+            self.account_id, transaction_id
+        );
+        self.client.put_json(&path, &metadata).await
+    }
+
+    async fn extend_authorization(&self, transaction_id: &str, days: u32) -> Result<Transaction> {
+        let path = format!(
+            "accounts/{}/transactions/{}/extend_authorization",
+            self.account_id, transaction_id
+        );
+        let body = serde_json::json!({ "days": days });
+        self.client.post_json(&path, &body).await
     }
 
     async fn capture_transaction(
@@ -212,6 +267,11 @@ impl<C: HttpClient> CheckoutOperations for CheckoutClient<C> {
 
     async fn get_card_token(&self, token_id: &str) -> Result<CardToken> {
         let path = format!("accounts/{}/card-tokens/{}", self.account_id, token_id);
+        self.client.get_json(&path).await
+    }
+
+    async fn list_card_tokens(&self) -> Result<Vec<CardToken>> {
+        let path = format!("accounts/{}/card-tokens", self.account_id);
         self.client.get_json(&path).await
     }
 
