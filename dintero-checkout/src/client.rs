@@ -1,4 +1,8 @@
+use crate::api_keys::{ApiKey, CreateApiKeyRequest, CreateApiKeyResponse, RotateApiKeyResponse};
 use crate::card_tokens::{CardToken, CardTokenListResponse, ListCardTokensParams};
+use crate::credit_checks::{CreditCheckRequest, CreditCheckResponse};
+use crate::qr_codes::{QrCodeRequest, QrCodeResponse};
+use crate::secrets::{CreateSignatureSecretRequest, SignatureSecret};
 use crate::sessions::{
     CheckoutSession, CreateProfileRequest, CreateSessionRequest, CreateSessionRequestPayload,
     ListSessionsParams, SessionListResponse, SessionProfile,
@@ -79,6 +83,22 @@ pub trait CheckoutOperations: Send + Sync {
     async fn list_card_tokens(&self, params: ListCardTokensParams)
         -> Result<CardTokenListResponse>;
     async fn delete_card_token(&self, token_id: &str) -> Result<()>;
+
+    async fn create_api_key(&self, request: CreateApiKeyRequest) -> Result<CreateApiKeyResponse>;
+    async fn list_api_keys(&self) -> Result<Vec<ApiKey>>;
+    async fn delete_api_key(&self, api_key_id: &str) -> Result<()>;
+    async fn rotate_api_key(&self, api_key_id: &str) -> Result<RotateApiKeyResponse>;
+
+    async fn create_signature_secret(
+        &self,
+        request: CreateSignatureSecretRequest,
+    ) -> Result<SignatureSecret>;
+    async fn get_signature_secret(&self) -> Result<SignatureSecret>;
+
+    async fn generate_qr_code(&self, request: QrCodeRequest) -> Result<QrCodeResponse>;
+
+    async fn perform_credit_check(&self, request: CreditCheckRequest)
+        -> Result<CreditCheckResponse>;
 }
 
 pub struct CheckoutClient<C> {
@@ -325,5 +345,57 @@ impl<C: HttpClient> CheckoutOperations for CheckoutClient<C> {
     async fn delete_card_token(&self, token_id: &str) -> Result<()> {
         let path = format!("accounts/{}/card-tokens/{}", self.account_id, token_id);
         self.client.delete(&path).await
+    }
+
+    async fn create_api_key(&self, request: CreateApiKeyRequest) -> Result<CreateApiKeyResponse> {
+        let path = format!("accounts/{}/api_keys", self.account_id);
+        self.client.post_json(&path, &request).await
+    }
+
+    async fn list_api_keys(&self) -> Result<Vec<ApiKey>> {
+        let path = format!("accounts/{}/api_keys", self.account_id);
+        self.client.get_json(&path).await
+    }
+
+    async fn delete_api_key(&self, api_key_id: &str) -> Result<()> {
+        let path = format!("accounts/{}/api_keys/{}", self.account_id, api_key_id);
+        self.client.delete(&path).await
+    }
+
+    async fn rotate_api_key(&self, api_key_id: &str) -> Result<RotateApiKeyResponse> {
+        let path = format!(
+            "accounts/{}/api_keys/{}/rotate",
+            self.account_id, api_key_id
+        );
+        self.client.post_json(&path, &serde_json::json!({})).await
+    }
+
+    async fn create_signature_secret(
+        &self,
+        request: CreateSignatureSecretRequest,
+    ) -> Result<SignatureSecret> {
+        let path = format!("accounts/{}/signature", self.account_id);
+        self.client.post_json(&path, &request).await
+    }
+
+    async fn get_signature_secret(&self) -> Result<SignatureSecret> {
+        let path = format!("accounts/{}/signature", self.account_id);
+        self.client.get_json(&path).await
+    }
+
+    async fn generate_qr_code(&self, request: QrCodeRequest) -> Result<QrCodeResponse> {
+        let path = format!(
+            "accounts/{}/sessions/{}/qr",
+            self.account_id, request.session_id
+        );
+        self.client.post_json(&path, &request).await
+    }
+
+    async fn perform_credit_check(
+        &self,
+        request: CreditCheckRequest,
+    ) -> Result<CreditCheckResponse> {
+        let path = "creditchecks".to_string();
+        self.client.post_json(&path, &request).await
     }
 }

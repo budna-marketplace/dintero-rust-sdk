@@ -12,7 +12,7 @@ keywords = ["dintero", "payments", "checkout", "api", "sdk"]
 categories = ["dintero", "sdk", "payment"]
 
 [features]
-default = []
+default = ["checkout", "orders", "payments", "accounts", "loyalty", "insights"]
 checkout = ["dep:dintero-checkout"]
 orders = ["dep:dintero-orders"]
 payments = ["dep:dintero-payments"]

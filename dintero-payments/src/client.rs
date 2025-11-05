@@ -1,4 +1,6 @@
+use crate::fund_transfers::*;
 use crate::payouts::*;
+use crate::sellers::*;
 use crate::settlements::*;
 use crate::transactions::*;
 use async_trait::async_trait;
@@ -83,6 +85,14 @@ pub trait PaymentsOperations: Send + Sync {
         &self,
         request: CreatePayoutTransferRequest,
     ) -> Result<PayoutTransfer>;
+
+    async fn initiate_fund_transfer(&self, request: FundTransferRequest) -> Result<FundTransfer>;
+    async fn get_seller_balance(&self, destination_id: &str) -> Result<SellerBalance>;
+    async fn list_seller_transfers(
+        &self,
+        destination_id: &str,
+        params: ListSellerTransfersParams,
+    ) -> Result<SellerTransfersResponse>;
 }
 
 #[async_trait]
@@ -306,5 +316,50 @@ impl<A: PaymentsAdapter> PaymentsOperations for PaymentsClient<A> {
     ) -> Result<PayoutTransfer> {
         let path = format!("accounts/{}/payout/fund_transfers", self.account_id);
         self.adapter.post_json(&path, &request).await
+    }
+
+    async fn initiate_fund_transfer(&self, request: FundTransferRequest) -> Result<FundTransfer> {
+        let path = format!("accounts/{}/payout/fund_transfers", self.account_id);
+        self.adapter.post_json(&path, &request).await
+    }
+
+    async fn get_seller_balance(&self, destination_id: &str) -> Result<SellerBalance> {
+        let path = format!(
+            "accounts/{}/payout_destinations/{}/balance",
+            self.account_id, destination_id
+        );
+        self.adapter.get_json(&path).await
+    }
+
+    async fn list_seller_transfers(
+        &self,
+        destination_id: &str,
+        params: ListSellerTransfersParams,
+    ) -> Result<SellerTransfersResponse> {
+        let mut path = format!(
+            "accounts/{}/payout_destinations/{}/transfers",
+            self.account_id, destination_id
+        );
+
+        let mut query_params = Vec::new();
+        if let Some(limit) = params.limit {
+            query_params.push(format!("limit={}", limit));
+        }
+        if let Some(token) = params.page_token {
+            query_params.push(format!("page_token={}", token));
+        }
+        if let Some(from_date) = params.from_date {
+            query_params.push(format!("from_date={}", from_date));
+        }
+        if let Some(to_date) = params.to_date {
+            query_params.push(format!("to_date={}", to_date));
+        }
+
+        if !query_params.is_empty() {
+            path.push('?');
+            path.push_str(&query_params.join("&"));
+        }
+
+        self.adapter.get_json(&path).await
     }
 }

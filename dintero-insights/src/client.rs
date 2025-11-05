@@ -28,4 +28,10 @@ impl InsightsClient {
             client: self.clone(),
         }
     }
+
+    pub fn report_configs(&self) -> crate::report_configs::ReportConfigsClient {
+        crate::report_configs::ReportConfigsClient {
+            client: self.clone(),
+        }
+    }
 }
