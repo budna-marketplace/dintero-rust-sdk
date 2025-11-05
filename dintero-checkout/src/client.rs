@@ -1,7 +1,7 @@
 use crate::card_tokens::CardToken;
 use crate::sessions::{
-    CheckoutSession, CreateSessionRequest, CreateSessionRequestPayload, ListSessionsParams,
-    SessionListResponse,
+    CheckoutSession, CreateProfileRequest, CreateSessionRequest, CreateSessionRequestPayload,
+    ListSessionsParams, SessionListResponse, SessionProfile,
 };
 use crate::transactions::{CaptureRequest, RefundRequest, Transaction, VoidRequest};
 use async_trait::async_trait;
@@ -29,6 +29,15 @@ pub trait CheckoutOperations: Send + Sync {
     async fn get_session(&self, session_id: &str) -> Result<CheckoutSession>;
     async fn list_sessions(&self, params: ListSessionsParams) -> Result<SessionListResponse>;
     async fn cancel_session(&self, session_id: &str) -> Result<CheckoutSession>;
+
+    async fn create_profile(&self, request: CreateProfileRequest) -> Result<SessionProfile>;
+    async fn get_profile(&self, profile_id: &str) -> Result<SessionProfile>;
+    async fn update_profile(
+        &self,
+        profile_id: &str,
+        request: CreateProfileRequest,
+    ) -> Result<SessionProfile>;
+    async fn delete_profile(&self, profile_id: &str) -> Result<()>;
 
     async fn get_transaction(&self, transaction_id: &str) -> Result<Transaction>;
     async fn capture_transaction(
@@ -122,6 +131,39 @@ impl<C: HttpClient> CheckoutOperations for CheckoutClient<C> {
             self.account_id, session_id
         );
         self.client.post_json(&path, &serde_json::json!({})).await
+    }
+
+    async fn create_profile(&self, request: CreateProfileRequest) -> Result<SessionProfile> {
+        let path = format!("accounts/{}/session_profile", self.account_id);
+        self.client.post_json(&path, &request).await
+    }
+
+    async fn get_profile(&self, profile_id: &str) -> Result<SessionProfile> {
+        let path = format!(
+            "accounts/{}/session_profile/{}",
+            self.account_id, profile_id
+        );
+        self.client.get_json(&path).await
+    }
+
+    async fn update_profile(
+        &self,
+        profile_id: &str,
+        request: CreateProfileRequest,
+    ) -> Result<SessionProfile> {
+        let path = format!(
+            "accounts/{}/session_profile/{}",
+            self.account_id, profile_id
+        );
+        self.client.put_json(&path, &request).await
+    }
+
+    async fn delete_profile(&self, profile_id: &str) -> Result<()> {
+        let path = format!(
+            "accounts/{}/session_profile/{}",
+            self.account_id, profile_id
+        );
+        self.client.delete(&path).await
     }
 
     async fn get_transaction(&self, transaction_id: &str) -> Result<Transaction> {
