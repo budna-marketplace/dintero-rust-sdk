@@ -10,7 +10,8 @@ use tracing::{debug, warn};
 pub struct HttpClient {
     client: Client,
     auth: Arc<dyn AuthProvider>,
-    base_url: String,
+    pub(crate) base_url: String,
+    pub(crate) api_token: String,
     account_id: String,
     max_retries: u32,
     initial_backoff_ms: u64,
@@ -29,10 +30,17 @@ impl HttpClient {
             .build()
             .map_err(|e| Error::Config(format!("Failed to create HTTP client: {}", e)))?;
 
+        let api_token = match &config.auth {
+            crate::config::AuthConfig::ApiKey(key) => key.clone(),
+            crate::config::AuthConfig::Jwt(token) => token.clone(),
+            crate::config::AuthConfig::OAuth { client_id, .. } => client_id.clone(),
+        };
+
         Ok(Self {
             client,
             auth,
             base_url: config.environment.base_url().to_string(),
+            api_token,
             account_id: config.account_id.clone(),
             max_retries: config.retry_config.max_retries,
             initial_backoff_ms: config.retry_config.initial_backoff_ms,
@@ -233,6 +241,7 @@ impl Clone for HttpClient {
             client: self.client.clone(),
             auth: Arc::clone(&self.auth),
             base_url: self.base_url.clone(),
+            api_token: self.api_token.clone(),
             account_id: self.account_id.clone(),
             max_retries: self.max_retries,
             initial_backoff_ms: self.initial_backoff_ms,

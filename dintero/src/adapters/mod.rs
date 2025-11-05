@@ -9,3 +9,6 @@ pub mod orders;
 
 #[cfg(feature = "payments")]
 pub mod payments;
+
+#[cfg(feature = "accounts")]
+pub mod accounts;
