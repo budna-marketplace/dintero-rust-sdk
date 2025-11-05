@@ -18,3 +18,6 @@ pub mod loyalty;
 
 #[cfg(feature = "loyalty")]
 pub use loyalty::LoyaltyAdapter;
+
+#[cfg(feature = "insights")]
+pub mod insights;

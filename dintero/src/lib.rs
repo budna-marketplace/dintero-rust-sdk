@@ -39,6 +39,11 @@ pub mod loyalty {
     pub use dintero_loyalty::automations::*;
 }
 
+#[cfg(feature = "insights")]
+pub mod insights {
+    pub use dintero_insights::*;
+}
+
 pub use client::HttpClient;
 pub use config::{AuthConfig, Config, ConfigBuilder, Environment, RetryConfig};
 pub use error::{Error, Result};

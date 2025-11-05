@@ -1,14 +1,18 @@
 [package]
 name = "dintero-payments"
-version = "0.1.0"
-edition = "2021"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "Payments API implementation for Dintero SDK"
 publish = false
 
 [dependencies]
-reqwest = { version = "0.12", features = ["json"] }
-serde = { version = "1.0", features = ["derive"] }
-serde_json = "1.0"
-thiserror = "2.0"
-chrono = { version = "0.4", features = ["serde"] }
-async-trait = "0.1"
-uuid = { version = "1.10", features = ["v4", "serde"] }
+reqwest.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+thiserror.workspace = true
+chrono.workspace = true
+async-trait.workspace = true
+uuid.workspace = true

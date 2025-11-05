@@ -1,18 +1,21 @@
 [package]
 name = "dintero-orders"
-version = "0.1.0"
-edition = "2021"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "Orders API implementation for Dintero SDK"
 publish = false
-description = "Internal implementation crate for Dintero Orders API"
 
 [dependencies]
-serde = { version = "1.0", features = ["derive"] }
-serde_json = "1.0"
-chrono = { version = "0.4", features = ["serde"] }
-uuid = { version = "1.10", features = ["v4", "serde"] }
-async-trait = "0.1"
-thiserror = "2.0"
+serde.workspace = true
+serde_json.workspace = true
+chrono.workspace = true
+uuid.workspace = true
+async-trait.workspace = true
+thiserror.workspace = true
 
 [dev-dependencies]
-tokio = { version = "1", features = ["full"] }
-tokio-test = "0.4"
+tokio.workspace = true
+tokio-test.workspace = true

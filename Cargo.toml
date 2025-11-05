@@ -1,4 +1,22 @@
 [workspace]
-members = ["dintero", "dintero-checkout", "dintero-orders", "dintero-payments", "dintero-accounts", "dintero-loyalty"]
+members = ["dintero", "dintero-checkout", "dintero-orders", "dintero-payments", "dintero-accounts", "dintero-loyalty", "dintero-insights"]
 resolver = "2"
+
+[workspace.package]
 version = "0.1.0"
+edition = "2021"
+authors = ["Marcus Cvjeticanin <mjovanc@icloud.com>"]
+license = "MIT"
+repository = "https://github.com/budna-platform/dintero-rust-sdk"
+
+[workspace.dependencies]
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+chrono = { version = "0.4", features = ["serde"] }
+uuid = { version = "1.10", features = ["v4", "serde"] }
+reqwest = { version = "0.12", features = ["json"] }
+async-trait = "0.1"
+thiserror = "2.0"
+url = "2"
+tokio = { version = "1", features = ["full"] }
+tokio-test = "0.4"

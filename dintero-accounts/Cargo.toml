@@ -1,15 +1,15 @@
 [package]
 name = "dintero-accounts"
-version = "0.1.0"
-edition = "2021"
-authors = ["Marcus Cvjeticanin <mjovanc@icloud.com>"]
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
 description = "Accounts API implementation for Dintero SDK"
-license = "MIT"
-repository = "https://github.com/budna-platform/dintero-rust-sdk"
 publish = false
 
 [dependencies]
-serde = { version = "1.0", features = ["derive"] }
-serde_json = "1.0"
-reqwest = { version = "0.12", features = ["json"] }
-thiserror = "1.0"
+serde.workspace = true
+serde_json.workspace = true
+reqwest.workspace = true
+thiserror.workspace = true
