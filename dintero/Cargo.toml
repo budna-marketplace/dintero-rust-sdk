@@ -9,7 +9,7 @@ repository = "https://github.com/budna-platform/dintero-rust-sdk"
 documentation = "https://docs.rs/dintero"
 readme = "../README.md"
 keywords = ["dintero", "payments", "checkout", "api", "sdk"]
-categories = ["dintero", "sdk", "payment"]
+categories = ["api-bindings", "web-programming"]
 
 [features]
 default = ["checkout", "orders", "payments", "accounts", "loyalty", "insights"]
