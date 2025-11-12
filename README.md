@@ -65,9 +65,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         "your-client-id",
         "your-client-secret"
     );
-    
+
     let client = DinteroClient::new(config);
-    
+
     Ok(())
 }
 ```
@@ -81,7 +81,7 @@ use dintero::DinteroClient;
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     // Reads from DINTERO_ACCOUNT_ID, DINTERO_CLIENT_ID, DINTERO_CLIENT_SECRET
     let client = DinteroClient::from_env()?;
-    
+
     Ok(())
 }
 ```
@@ -94,11 +94,11 @@ use dintero::{DinteroClient, DinteroConfig};
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let client = DinteroClient::from_env()?;
-    
+
     #[cfg(feature = "checkout")]
     {
         use dintero_checkout::{SessionCreateRequest, Order, OrderLine, Money};
-        
+
         let request = SessionCreateRequest::builder()
             .url("https://example.com/return".to_string())
             .order(
@@ -115,11 +115,11 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                     .build()
             )
             .build();
-        
+
         let session = client.checkout().create_session(request).await?;
         println!("Checkout URL: {}", session.url);
     }
-    
+
     Ok(())
 }
 ```
@@ -132,18 +132,18 @@ use dintero::{DinteroClient, DinteroConfig};
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let client = DinteroClient::from_env()?;
-    
+
     #[cfg(feature = "orders")]
     {
         // Get an order
         let order = client.orders().get_order("order-id").await?;
         println!("Order status: {:?}", order.status);
-        
+
         // List orders
         let orders = client.orders().list_orders().await?;
         println!("Found {} orders", orders.len());
     }
-    
+
     Ok(())
 }
 ```
@@ -156,23 +156,23 @@ use dintero::{DinteroClient, DinteroConfig};
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let client = DinteroClient::from_env()?;
-    
+
     #[cfg(feature = "payments")]
     {
         use dintero_payments::CaptureRequest;
-        
+
         // Capture a payment
         let capture = CaptureRequest::builder()
             .amount(5000)
             .build();
-        
+
         let result = client.payments()
             .capture_payment("transaction-id", capture)
             .await?;
-        
+
         println!("Captured: {}", result.amount);
     }
-    
+
     Ok(())
 }
 ```
@@ -241,14 +241,14 @@ use dintero::{DinteroClient, DinteroError};
 
 async fn example() -> Result<(), DinteroError> {
     let client = DinteroClient::from_env()?;
-    
+
     match client.checkout().get_session("session-id").await {
         Ok(session) => println!("Session found: {}", session.id),
         Err(DinteroError::NotFound) => println!("Session not found"),
         Err(DinteroError::Authentication) => println!("Authentication failed"),
         Err(e) => println!("Error: {}", e),
     }
-    
+
     Ok(())
 }
 ```
@@ -290,4 +290,4 @@ Author: Marcus Cvjeticanin
 ## Support
 
 - [Dintero Documentation](https://docs.dintero.com)
-- [GitHub Issues](https://github.com/budna-platform/dintero-rust-sdk/issues)
+- [GitHub Issues](https://github.com/budna-marketplace/dintero-rust-sdk/issues)

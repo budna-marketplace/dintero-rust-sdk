@@ -3,11 +3,11 @@ members = ["dintero", "dintero-checkout", "dintero-orders", "dintero-payments", 
 resolver = "2"
 
 [workspace.package]
-version = "0.1.0"
+version = "0.1.1"
 edition = "2021"
 authors = ["Marcus Cvjeticanin <mjovanc@icloud.com>"]
 license = "MIT"
-repository = "https://github.com/budna-platform/dintero-rust-sdk"
+repository = "https://github.com/budna-marketplace/dintero-rust-sdk"
 
 [workspace.dependencies]
 serde = { version = "1.0", features = ["derive"] }

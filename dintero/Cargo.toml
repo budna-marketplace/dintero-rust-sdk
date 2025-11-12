@@ -1,11 +1,11 @@
 [package]
 name = "dintero"
-version = "0.1.0"
-edition = "2021"
-authors = ["Marcus Cvjeticanin <mjovanc@icloud.com>"]
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
 description = "Rust SDK for Dintero APIs"
-license = "MIT"
-repository = "https://github.com/budna-platform/dintero-rust-sdk"
+license.workspace = true
+repository = "https://github.com/budna-marketplace/dintero-rust-sdk"
 documentation = "https://docs.rs/dintero"
 readme = "../README.md"
 keywords = ["dintero", "payments", "checkout", "api", "sdk"]

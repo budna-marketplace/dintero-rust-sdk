@@ -1,6 +1,6 @@
 //! # Dintero Rust SDK
 //!
-//! Official Rust SDK for the Dintero API.
+//! Rust SDK for the Dintero API.
 //!
 //! This SDK provides a comprehensive interface to all Dintero APIs including Checkout, Orders,
 //! Payments, Accounts, Loyalty, and Insights.
