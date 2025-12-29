@@ -10,8 +10,9 @@ use crate::credit_checks::{CreditCheckRequest, CreditCheckResponse};
 use crate::qr_codes::{QrCodeRequest, QrCodeResponse};
 use crate::secrets::{CreateSignatureSecretRequest, SignatureSecret};
 use crate::sessions::{
-    CheckoutSession, CreateProfileRequest, CreateSessionRequest, CreateSessionRequestPayload,
-    ListSessionsParams, SessionListResponse, SessionProfile,
+    CheckoutSession, CreateMerchantInitiatedSessionRequest, CreateProfileRequest,
+    CreateSessionRequest, CreateSessionRequestPayload, ListSessionsParams, SessionListResponse,
+    SessionProfile,
 };
 use crate::transactions::{
     CaptureRequest, ExtendAuthorizationRequest, ListTransactionsParams, RefundRequest, Transaction,
@@ -48,6 +49,13 @@ impl From<serde_json::Error> for CheckoutError {
 pub trait CheckoutOperations: Send + Sync {
     /// Creates a new checkout session.
     async fn create_session(&self, request: CreateSessionRequest) -> Result<CheckoutSession>;
+
+    /// Creates a merchant-initiated session for recurring or unscheduled payments.
+    /// This is used to charge a customer using a previously stored recurrence or payment token.
+    async fn create_merchant_initiated_session(
+        &self,
+        request: CreateMerchantInitiatedSessionRequest,
+    ) -> Result<CheckoutSession>;
 
     /// Retrieves a checkout session by ID.
     async fn get_session(&self, session_id: &str) -> Result<CheckoutSession>;
@@ -201,6 +209,14 @@ impl<C: HttpClient> CheckoutOperations for CheckoutClient<C> {
         let path = format!("accounts/{}/sessions", self.account_id);
         let payload: CreateSessionRequestPayload = request.into();
         self.client.post_json(&path, &payload).await
+    }
+
+    async fn create_merchant_initiated_session(
+        &self,
+        request: CreateMerchantInitiatedSessionRequest,
+    ) -> Result<CheckoutSession> {
+        let path = format!("accounts/{}/sessions/pay", self.account_id);
+        self.client.post_json(&path, &request).await
     }
 
     async fn get_session(&self, session_id: &str) -> Result<CheckoutSession> {

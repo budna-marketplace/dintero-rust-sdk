@@ -34,12 +34,12 @@ tracing-subscriber = "0.3"
 async-trait = "0.1"
 bytes = "1.5"
 
-dintero-checkout = { version = "0.1.0", path = "../dintero-checkout", optional = true }
-dintero-orders = { version = "0.1.0", path = "../dintero-orders", optional = true }
-dintero-payments = { version = "0.1.0", path = "../dintero-payments", optional = true }
-dintero-accounts = { version = "0.1.0", path = "../dintero-accounts", optional = true }
-dintero-loyalty = { version = "0.1.0", path = "../dintero-loyalty", optional = true }
-dintero-insights = { version = "0.1.0", path = "../dintero-insights", optional = true }
+dintero-checkout = { version = "0.2.0", path = "../dintero-checkout", optional = true }
+dintero-orders = { version = "0.2.0", path = "../dintero-orders", optional = true }
+dintero-payments = { version = "0.2.0", path = "../dintero-payments", optional = true }
+dintero-accounts = { version = "0.2.0", path = "../dintero-accounts", optional = true }
+dintero-loyalty = { version = "0.2.0", path = "../dintero-loyalty", optional = true }
+dintero-insights = { version = "0.2.0", path = "../dintero-insights", optional = true }
 
 [dev-dependencies]
 tokio = { version = "1", features = ["full"] }
