@@ -102,6 +102,132 @@ pub struct ShippingAddress {
 
 pub type BillingAddress = ShippingAddress;
 
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+pub struct SessionConfiguration {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub auto_capture: Option<bool>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub payex: Option<PayexConfiguration>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub bambora: Option<BamboraConfiguration>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub dintero_psp: Option<DinteroPspConfiguration>,
+}
+
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+pub struct PayexConfiguration {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub creditcard: Option<PayexCreditcardConfiguration>,
+}
+
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+pub struct PayexCreditcardConfiguration {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub enabled: Option<bool>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub generate_payment_token: Option<bool>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub generate_recurrence_token: Option<bool>,
+}
+
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+pub struct BamboraConfiguration {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub creditcard: Option<BamboraCreditcardConfiguration>,
+}
+
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+pub struct BamboraCreditcardConfiguration {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub enabled: Option<bool>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub generate_payment_token: Option<bool>,
+}
+
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+pub struct DinteroPspConfiguration {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub creditcard: Option<DinteroPspCreditcardConfiguration>,
+}
+
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+pub struct DinteroPspCreditcardConfiguration {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub enabled: Option<bool>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub generate_payment_token: Option<bool>,
+}
+
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+pub struct CustomerTokens {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub payex: Option<PayexTokens>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub bambora: Option<BamboraTokens>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub dintero_psp: Option<DinteroPspTokens>,
+}
+
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+pub struct PayexTokens {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub creditcard: Option<PayexCreditcardTokens>,
+}
+
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+pub struct PayexCreditcardTokens {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub payment_token: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub recurrence_token: Option<String>,
+}
+
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+pub struct BamboraTokens {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub creditcard: Option<BamboraCreditcardTokens>,
+}
+
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+pub struct BamboraCreditcardTokens {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub payment_token: Option<String>,
+}
+
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+pub struct DinteroPspTokens {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub creditcard: Option<DinteroPspCreditcardTokens>,
+}
+
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+pub struct DinteroPspCreditcardTokens {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub payment_token: Option<String>,
+}
+
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+pub struct Customer {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub email: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub phone_number: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub tokens: Option<CustomerTokens>,
+}
+
 #[derive(Debug, Clone)]
 pub struct CreateSessionRequest {
     pub url: SessionUrl,
@@ -109,6 +235,8 @@ pub struct CreateSessionRequest {
     pub profile_id: Option<String>,
     pub return_url: Option<String>,
     pub merchant_terms_url: Option<String>,
+    pub configuration: Option<SessionConfiguration>,
+    pub customer: Option<Customer>,
 }
 
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
@@ -130,6 +258,8 @@ pub struct CreateSessionRequestBuilder {
     profile_id: Option<String>,
     return_url: Option<String>,
     merchant_terms_url: Option<String>,
+    configuration: Option<SessionConfiguration>,
+    customer: Option<Customer>,
 }
 
 impl CreateSessionRequestBuilder {
@@ -158,6 +288,56 @@ impl CreateSessionRequestBuilder {
         self
     }
 
+    pub fn configuration(mut self, config: SessionConfiguration) -> Self {
+        self.configuration = Some(config);
+        self
+    }
+
+    pub fn customer(mut self, customer: Customer) -> Self {
+        self.customer = Some(customer);
+        self
+    }
+
+    pub fn generate_payex_recurrence_token(mut self) -> Self {
+        let config = self.configuration.get_or_insert_with(SessionConfiguration::default);
+        let payex = config.payex.get_or_insert_with(PayexConfiguration::default);
+        let creditcard = payex.creditcard.get_or_insert_with(PayexCreditcardConfiguration::default);
+        creditcard.generate_recurrence_token = Some(true);
+        self
+    }
+
+    pub fn generate_payex_payment_token(mut self) -> Self {
+        let config = self.configuration.get_or_insert_with(SessionConfiguration::default);
+        let payex = config.payex.get_or_insert_with(PayexConfiguration::default);
+        let creditcard = payex.creditcard.get_or_insert_with(PayexCreditcardConfiguration::default);
+        creditcard.generate_payment_token = Some(true);
+        self
+    }
+
+    pub fn generate_bambora_payment_token(mut self) -> Self {
+        let config = self.configuration.get_or_insert_with(SessionConfiguration::default);
+        let bambora = config.bambora.get_or_insert_with(BamboraConfiguration::default);
+        let creditcard =
+            bambora.creditcard.get_or_insert_with(BamboraCreditcardConfiguration::default);
+        creditcard.generate_payment_token = Some(true);
+        self
+    }
+
+    pub fn generate_dintero_psp_payment_token(mut self) -> Self {
+        let config = self.configuration.get_or_insert_with(SessionConfiguration::default);
+        let dintero_psp = config.dintero_psp.get_or_insert_with(DinteroPspConfiguration::default);
+        let creditcard =
+            dintero_psp.creditcard.get_or_insert_with(DinteroPspCreditcardConfiguration::default);
+        creditcard.generate_payment_token = Some(true);
+        self
+    }
+
+    pub fn auto_capture(mut self, auto_capture: bool) -> Self {
+        let config = self.configuration.get_or_insert_with(SessionConfiguration::default);
+        config.auto_capture = Some(auto_capture);
+        self
+    }
+
     pub fn build(self) -> Result<CreateSessionRequest, String> {
         let order = self.order.ok_or("order is required")?;
 
@@ -167,6 +347,8 @@ impl CreateSessionRequestBuilder {
             profile_id: self.profile_id,
             return_url: self.return_url,
             merchant_terms_url: self.merchant_terms_url,
+            configuration: self.configuration,
+            customer: self.customer,
         })
     }
 }
